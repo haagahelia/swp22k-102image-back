@@ -1,0 +1,27 @@
+{
+  "name": "swp22k-102image-back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/haagahelia/swp22k-102image-back.git"
+  },
+  "author": "Jonathan B.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/haagahelia/swp22k-102image-back/issues"
+  },
+  "homepage": "https://github.com/haagahelia/swp22k-102image-back#readme",
+  "dependencies": {
+    "express": "^4.17.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
