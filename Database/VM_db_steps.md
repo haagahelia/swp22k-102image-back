@@ -1,19 +1,29 @@
 # Checkout the Database Using VM 
 
 1. Open Putty
-2. In the Host Name input box, add "195.148.22.114". Keep the port as 22
-3. Click "Open"
-4. A console will be open with the line "login as:", type "juuuser1"
+2. In the Host Name input box, add **195.148.22.114**. Keep the port as **22**
+3. Click **Open**
+4. A console will be open with the line "login as:", type **juuuser1**
 5. The console will then ask for password, type the provided password in Teams accordingly 
 6. Type
 
-    sudo mysql
+        sudo mysql
 
 7. You will be prompted for password once again, type the password in
 8. You're now using MariaDB, select the database by typing
 
-    use swp22k_102image;
+        use swp22k_102image;
 
 9. You can check the available tables by typing
 
-    show tables;
+        show tables;
+
+10. If at some points, you get an error "ERROR 2002 (HY000)...", exit the database if you're inside it 
+
+        exit
+
+11. Start MySQL server 
+
+        sudo /etc/init.d/mysql start
+
+11. After that press Ctrl + C and return to step 6
