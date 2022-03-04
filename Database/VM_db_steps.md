@@ -1,4 +1,6 @@
-# Checkout the Database Using VM 
+# Checkout the Database Using VM
+
+Please notice that this is a guide for you to check the database out, not the guide to connect to it.
 
 1. Open Putty
 2. In the Host Name input box, add **195.148.22.114**. Keep the port as **22**
@@ -24,6 +26,6 @@
 
 11. Start MySQL server 
 
-        sudo /etc/init.d/mysql start
+        sudo service mysql start
 
 11. After that press Ctrl + C and return to step 6
