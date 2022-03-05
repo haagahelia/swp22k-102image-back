@@ -1,0 +1,1 @@
+ssh juuuser1@195.148.22.114 -L 3308:localhost:3306
