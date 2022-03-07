@@ -1,0 +1,6 @@
+POST http://localhost:8787/api/signatures
+Content-Type: "application/json"
+
+{
+  "signature" : "TEST:THisIsASampleBase64String"
+}

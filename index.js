@@ -1,14 +1,15 @@
-import express from 'express';
-import db from './db/index.js';
+import express from "express";
+//"db" is knex, change to knex for clarity?
+import db from "./db/index.js";
 
 const app = express();
 
 //Test localhost:8787 from browser
-app.get('/', (_request, response) => {
-  response.send('<h1>Hello World!</h1>')
+app.get("/", (_, res) => {
+  res.send('<h1>Hello World!</h1>')
 })
 
-// Test route for getting signatures from db
+/* // Test route for getting signatures from db
 app.get("/api/signatures", async (_, res) => {
   try {
     const signatures = await db("Signature")
@@ -16,6 +17,33 @@ app.get("/api/signatures", async (_, res) => {
   } catch (err) {
     console.log(err)
   }
+}) */
+
+// Test route for getting signatures from db
+app.get("/api/signatures", (_, res) => {
+  db
+    .select()
+    .from("Signature")
+    .then(data => {
+      console.log(data)
+      res.status(200).send(data).end()
+    })
+    .catch(err => console.log(err))
+})
+
+//POST mapping to save image to DB
+app.post("/api/signatures", (req, res) => {
+  const signature = req.body
+  console.log(signature)
+  //knex operation
+  db
+    .insert(signature)
+    .into("Signature")
+    .then(data => {
+      console.log(data)
+      res.status(200).send(data).end()
+    })
+    .catch(err => console.log(err))
 })
 
 const PORT = 8787
