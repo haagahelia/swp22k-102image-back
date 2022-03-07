@@ -1,0 +1,6 @@
+POST http://localhost:3306/api/signatures
+Content-Type: application/json
+
+{
+  "image" : "TEST:THisIsASampleBase64String"
+}
