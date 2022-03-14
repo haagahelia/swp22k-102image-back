@@ -1,10 +1,14 @@
 import express from "express";
 //"db" is knex, change to knex for clarity?
 import db from "./db/index.js";
+import cors from 'cors';
+import fileupload from 'express-fileupload';
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
+app.use(fileupload());
 
 //Test localhost:8787 from browser
 app.get("/", (_, res) => {
@@ -23,8 +27,12 @@ app.get("/api/signatures", async (_, res) => {
 
 //POST mapping to save image to DB
 app.post("/api/signatures", (req, res) => {
-  const image = req.body
-  console.log(image)
+  //Note req.files not req.body!
+  const body = req.files;
+  //console.dir(body);
+  const image = body.signature;
+  console.log(image);
+
   //knex operation
   db
     .insert(image)
