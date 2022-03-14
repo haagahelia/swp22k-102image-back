@@ -4,11 +4,16 @@ import db from "./db/index.js";
 import cors from 'cors';
 import fileupload from 'express-fileupload';
 
+import { readFileSync } from 'fs';
+
 const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use(fileupload());
+app.use(fileupload({
+  useTempFiles : true,
+  tempFileDir : '/tmp/'
+}));
 
 //Test localhost:8787 from browser
 app.get("/", (_, res) => {
@@ -29,22 +34,20 @@ app.get("/api/signatures", async (_, res) => {
 app.post("/api/signatures", (req, res) => {
   //Note req.files not req.body!
   const body = req.files;
-  //console.dir(body);
-  const image = body.signature;
-  console.log(image);
 
+  const image = body.signature;
+  var filecontents = readFileSync(image.tempFilePath).toString();
   //knex operation
   db
-    .insert(image)
+    .insert({image : filecontents})
     .into("Signature")
     .then(data => {
-      console.log(data)
-      res.status(200).send(data).end()
+      res.status(200).send({status : "ok",data : data}).end()
     })
     .catch(err => console.log(err))
 })
 
-const PORT = 3306
+const PORT = 8787
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
