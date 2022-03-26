@@ -1,10 +1,14 @@
 import express from "express";
-//"db" is knex, change to knex for clarity?
-import db from "./db/index.js";
+import knex from "./db/index.js";
 import cors from 'cors';
-import fileupload from 'express-fileupload';
-
+import fileupload from 'express-fileupload'
 import { readFileSync } from 'fs';
+import { logger } from "./utils/logger.js";
+import {
+  successHandler,
+  requestErrorHandler,
+  serverErrorHandler
+} from "./responseHandlers/index.js"
 
 const app = express();
 
@@ -24,9 +28,11 @@ app.get("/", (_, res) => {
 app.get("/api/signatures", async (_, res) => {
   try {
     const signatures = await db("Signature")
-    res.status(200).json(signatures)
+    return signatures 
+    ? successHandler(res, signatures) 
+    : requestErrorHandler(res, 404, "Request error. Data not found.")
   } catch (err) {
-    console.log(err)
+    serverErrorHandler(res, err)
   }
 })
 
@@ -35,19 +41,25 @@ app.post("/api/signatures", (req, res) => {
   //Note req.files not req.body!
   const body = req.files;
 
+  if (!body) return requestErrorHandler(res, 404, "Signature not found in body")
+
   const image = body.signature;
+
   var filecontents = readFileSync(image.tempFilePath).toString();
+
   //knex operation
-  db
+  knex
     .insert({image : filecontents})
     .into("Signature")
     .then(data => {
-      res.status(200).send({status : "ok",data : data}).end()
+      return data 
+      ? successHandler(res, data)
+      : requestErrorHandler(res, 400)
     })
-    .catch(err => console.log(err))
+    .catch(err => serverErrorHandler(res, err))
 })
 
 const PORT = 8787
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+  logger.info(`Server running on port ${PORT}`)
 })
