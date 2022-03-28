@@ -7,17 +7,21 @@ export const serverErrorHandler = (res, message) => {
 
     logger.error(message);
 
-    res.status(500).json({ message: message }).end();
+    return res.status(500).json({ message: message }).end();
 }
 
-export const requestErrorHandler = (res, message) => {
+export const requestErrorHandler = (res, code, message) => {
     if(!message) { 
         message = "Request error.";
     }
     
     logger.error(message);
 
-    res.status(400).json({ message: message }).end();
+    if (code) {
+        return res.status(code).json({ message: message }).end();
+    }
+
+    return res.status(400).json({ message: message }).end();
 }
 
 export const successHandler = (res, data, message) => {
@@ -26,5 +30,5 @@ export const successHandler = (res, data, message) => {
     }
     logger.verbose(message);
 
-    res.status(200).send(data).end();  
+    return res.status(200).send(data).end();  
 }
