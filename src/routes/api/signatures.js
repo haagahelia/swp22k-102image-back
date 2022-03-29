@@ -24,11 +24,11 @@ signatureRouter.get("/", async (_, res) => {
 //POST mapping to save image to DB
 signatureRouter.post("/", (req, res) => {
     //Note req.files not req.body!
-    const body = req.files;
+    const files = req.files;
 
-    if (!body) return requestErrorHandler(res, 404, "Signature not found in body")
+    if (!files) return requestErrorHandler(res, 404, "Signature not found in body")
 
-    const image = body.signature;
+    const image = files.signature;
 
     var filecontents = readFileSync(image.tempFilePath).toString();
 
@@ -36,11 +36,7 @@ signatureRouter.post("/", (req, res) => {
     knex
         .insert({image : filecontents})
         .into("Signature")
-        .then(data => {
-            return data 
-            ? successHandler(res, data)
-            : requestErrorHandler(res, 400)
-        })
+        .then(rowIdArr => successHandler(res, rowIdArr))
         .catch(err => databaseErrorHandler(res, err))
 })
 
