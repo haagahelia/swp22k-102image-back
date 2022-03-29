@@ -7,7 +7,7 @@ const logConfiguration = {
         }),
         new winston.transports.File({
             filename: './logs/winstonBackendLog.log',
-            level: "debug"
+            level: "silly"
         }),
     ]
 };
