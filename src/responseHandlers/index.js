@@ -45,9 +45,9 @@ export const successHandler = (res, data, message, code) => {
         if (code === 204) {
             return res.status(204).end();
         } else {
-            return res.status(code).send({ message: message }).end();  
+            return res.status(code).send({ message: message, data: data }).end();  
         }
     }
 
-    return res.status(200).send({ message: message }).end();  
+    return res.status(200).send({ message: message, data: data }).end();  
 }
