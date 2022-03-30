@@ -35,11 +35,15 @@ export const requestErrorHandler = (res, code, message) => {
     return res.status(400).json({ message: message }).end();
 }
 
-export const successHandler = (res, data, message) => {
+export const successHandler = (res, data, message, code) => {
     if(!message) { 
         message = "Success request"; 
     }
     logger.verbose(message);
+
+    if (code) {
+        return res.status(204).end();
+    }
 
     return res.status(200).send(data).end();  
 }
