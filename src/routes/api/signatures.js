@@ -75,7 +75,7 @@ signatureRouter.delete("/:id", async (req, res) => {
         .where("id", req.params.id)
         .del()
       if (rowsAffected === 1) {
-        successHandler(res, rowsAffected, `Successfully deleted signature, modified rows: ${rowsAffected}.`);
+        successHandler(res, rowsAffected, `Successfully deleted signature, modified rows: ${rowsAffected}.`, 204);
       } else {
         requestErrorHandler(res, 404, `Signature with id: ${req.params.id} not found.`);
       }
