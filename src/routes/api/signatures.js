@@ -85,24 +85,24 @@ signatureRouter.delete("/:id", async (req, res) => {
   }
 })
 
-//UPDATE ONE BY ID PUT http:localhost:8787/api/signatures
-signatureRouter.put("/", async (req, res) => {
+//UPDATE ONE BY ID PUT http:localhost:8787/api/signatures/:id
+signatureRouter.put("/:id", async (req, res) => {
   const files = req.files;
   if (!files) {
     requestErrorHandler(res, 400, "Request error. Data not found.");
-  } else if (!files.id) {
+  } else if (!req.params.id) {
     requestErrorHandler(res, 400, "Signature id is missing.");
   } else {
     try {
       const image = files.signature;
       const fileContents = readFileSync(image.tempFilePath).toString();
       const rowsAffected = await knex("Signature")
-        .where("id", files.id)
+        .where({ id: req.params.id })
         .update({ image: fileContents })
       if (rowsAffected === 1) {
-        successHandler(res, rowsAffected, `Successfully updated signature, modified rows: ${rowsAffected}.`)
+        successHandler(res, String(rowsAffected), `Successfully updated signature, modified rows: ${rowsAffected}.`)
       } else {
-        requestErrorHandler(res, 404, `Signature with id: ${files.id} not found.`)
+        requestErrorHandler(res, 409, `Duplicated: signature with id ${req.params.id}.`)
       }
     } catch (error) {
       databaseErrorHandler(res, error)

@@ -42,8 +42,12 @@ export const successHandler = (res, data, message, code) => {
     logger.verbose(message);
 
     if (code) {
-        return res.status(204).end();
+        if (code === 204) {
+            return res.status(204).end();
+        } else {
+            return res.status(code).send({ message: message }).end();  
+        }
     }
 
-    return res.status(200).send(data).end();  
+    return res.status(200).send({ message: message }).end();  
 }
