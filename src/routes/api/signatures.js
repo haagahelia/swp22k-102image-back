@@ -14,7 +14,7 @@ signatureRouter.get("/all", async (_, res) => {
   try {
     const signatures = await knex("Signature")
     return signatures
-      ? successHandler(res, signatures)
+      ? successHandler(res, signatures, "Signatures successfully retrieved.")
       : requestErrorHandler(res, 404, "Request error. Data not found.")
   } catch (err) {
     databaseErrorHandler(res, err)
@@ -23,8 +23,8 @@ signatureRouter.get("/all", async (_, res) => {
 
 //GET ONE BY ID http:localhost:8787/api/signatures/:id
 signatureRouter.get("/:id", (req, res) => {
-  if (isNaN(req.params.id)) {
-    requestErrorHandler(res, 400, `Invalid id: ${req.params.id}`);
+  if (!req.params.id) {
+    requestErrorHandler(res, 400, "Signature id is missing.");
   } else {
     knex
       .select()
@@ -34,7 +34,7 @@ signatureRouter.get("/:id", (req, res) => {
         if (sigArray.length === 1) {
           successHandler(res, sigArray);
         } else {
-          requestErrorHandler(res, 404, "Signature id not found.");
+          requestErrorHandler(res, 404, `Signature with id: ${req.params.id} not found.`);
         }
       })
       .catch(error => databaseErrorHandler(res, error))
@@ -45,32 +45,34 @@ signatureRouter.get("/:id", (req, res) => {
 signatureRouter.post("/", (req, res) => {
   //Note req.files not req.body!
   const files = req.files;
-  if (!files.signature) {
-    return requestErrorHandler(res, 404, "Signature not found in file");
+  if (!files) {
+    requestErrorHandler(res, 400, "Request error. Data not found.");
+  } else if (!files.signature) {
+    requestErrorHandler(res, 400, "Signature not found in file");
   } else {
     const image = files.signature;
     const filecontents = readFileSync(image.tempFilePath).toString();
     knex
       .insert({ image: filecontents })
       .into("Signature")
-      .then(rowIdArr => successHandler(res, rowIdArr, "Signature successfully saved."))
+      .then(rowIdArr => successHandler(res, rowIdArr, `Signature successfully saved, inserted row id: ${rowIdArr}`))
       .catch(err => databaseErrorHandler(res, err))
   }
 })
 
 //DELETE ONE BY ID http:localhost:8787/api/signatures/:id
 signatureRouter.delete("/:id", (req, res) => {
-  if (isNaN(req.params.id)) {
-    requestErrorHandler(res, 400, `Invalid id: ${req.params.id}`);
+  if (!req.params.id) {
+    requestErrorHandler(res, 400, "Signature id is missing.");
   } else {
     knex("Signature")
       .where("id", req.params.id)
       .del()
       .then(rowsAffected => {
         if (rowsAffected === 1) {
-          successHandler(res, rowsAffected, `Successfully deleted signature with id: ${req.files.id}.`);
+          successHandler(res, rowsAffected, `Successfully deleted signature, modified rows: ${rowsAffected}.`);
         } else {
-          requestErrorHandler(res, 404, "Signature id not found.");
+          requestErrorHandler(res, 404, `Signature with id: ${req.params.id} not found.`);
         }
       })
       .catch(error => databaseErrorHandler(res, error))
@@ -79,21 +81,22 @@ signatureRouter.delete("/:id", (req, res) => {
 
 //UPDATE ONE BY ID PUT http:localhost:8787/api/signatures
 signatureRouter.put("/", (req, res) => {
-  if (!req.files.id) {
+  const files = req.files;
+  if (!files) {
+    requestErrorHandler(res, 400, "Request error. Data not found.");
+  } else if (!files.id) {
     requestErrorHandler(res, 400, "Signature id is missing.");
-  } else if (isNaN(req.files.id)) {
-    requestErrorHandler(res, 400, `Invalid id: ${req.params.id}`);
   } else {
-    const image = req.files.signature;
+    const image = files.signature;
     const fileContents = readFileSync(image.tempFilePath).toString();
     knex("Signature")
-      .where("id", req.files.id)
+      .where("id", files.id)
       .update({ image: fileContents })
       .then(rowsAffected => {
         if (rowsAffected === 1) {
-          successHandler(res, rowsAffected, `Successfully updated signature with id: ${req.files.id}.`)
+          successHandler(res, rowsAffected, `Successfully updated signature, modified rows: ${rowsAffected}.`)
         } else {
-          requestErrorHandler(res, 404, "Signature id not found.")
+          requestErrorHandler(res, 404, `Signature with id: ${files.id} not found.`)
         }
       })
       .catch(error => {
