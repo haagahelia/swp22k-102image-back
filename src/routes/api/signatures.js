@@ -22,27 +22,29 @@ signatureRouter.get("/all", async (_, res) => {
 })
 
 //GET ONE BY ID http:localhost:8787/api/signatures/:id
-signatureRouter.get("/:id", (req, res) => {
+signatureRouter.get("/:id", async (req, res) => {
   if (!req.params.id) {
     requestErrorHandler(res, 400, "Signature id is missing.");
   } else {
-    knex
-      .select()
-      .from("Signature")
-      .where("id", req.params.id)
-      .then(sigArray => {
-        if (sigArray.length === 1) {
-          successHandler(res, sigArray);
-        } else {
-          requestErrorHandler(res, 404, `Signature with id: ${req.params.id} not found.`);
-        }
-      })
-      .catch(error => databaseErrorHandler(res, error))
+    try {
+      const sigArray = await knex
+        .select()
+        .from("Signature")
+        .where("id", req.params.id)
+
+      if (sigArray.length === 1) {
+        successHandler(res, sigArray);
+      } else {
+        requestErrorHandler(res, 404, `Signature with id: ${req.params.id} not found.`);
+      }
+    } catch (error) {
+      databaseErrorHandler(res, error);
+    }
   }
 })
 
 //SAVE TO DB POST http:localhost:8787/api/signatures
-signatureRouter.post("/", (req, res) => {
+signatureRouter.post("/", async (req, res) => {
   //Note req.files not req.body!
   const files = req.files;
   if (!files) {
@@ -50,58 +52,61 @@ signatureRouter.post("/", (req, res) => {
   } else if (!files.signature) {
     requestErrorHandler(res, 400, "Signature not found in file");
   } else {
-    const image = files.signature;
-    const filecontents = readFileSync(image.tempFilePath).toString();
-    knex
-      .insert({ image: filecontents })
-      .into("Signature")
-      .then(rowIdArr => successHandler(res, rowIdArr, `Signature successfully saved, inserted row id: ${rowIdArr}`))
-      .catch(err => databaseErrorHandler(res, err))
+    try {
+      const image = files.signature;
+      const filecontents = readFileSync(image.tempFilePath).toString();
+      const rowIdArr = await knex
+        .insert({ image: filecontents })
+        .into("Signature")
+      successHandler(res, rowIdArr, `Signature successfully saved, inserted row id: ${rowIdArr}`)
+    } catch (err) {
+      databaseErrorHandler(res, err);
+    }
   }
 })
 
 //DELETE ONE BY ID http:localhost:8787/api/signatures/:id
-signatureRouter.delete("/:id", (req, res) => {
+signatureRouter.delete("/:id", async (req, res) => {
   if (!req.params.id) {
     requestErrorHandler(res, 400, "Signature id is missing.");
   } else {
-    knex("Signature")
-      .where("id", req.params.id)
-      .del()
-      .then(rowsAffected => {
-        if (rowsAffected === 1) {
-          successHandler(res, rowsAffected, `Successfully deleted signature, modified rows: ${rowsAffected}.`);
-        } else {
-          requestErrorHandler(res, 404, `Signature with id: ${req.params.id} not found.`);
-        }
-      })
-      .catch(error => databaseErrorHandler(res, error))
+    try {
+      const rowsAffected = await knex("Signature")
+        .where("id", req.params.id)
+        .del()
+      if (rowsAffected === 1) {
+        successHandler(res, rowsAffected, `Successfully deleted signature, modified rows: ${rowsAffected}.`);
+      } else {
+        requestErrorHandler(res, 404, `Signature with id: ${req.params.id} not found.`);
+      }
+    } catch (error) {
+      databaseErrorHandler(res, error)
+    }
   }
 })
 
 //UPDATE ONE BY ID PUT http:localhost:8787/api/signatures
-signatureRouter.put("/", (req, res) => {
+signatureRouter.put("/", async (req, res) => {
   const files = req.files;
   if (!files) {
     requestErrorHandler(res, 400, "Request error. Data not found.");
   } else if (!files.id) {
     requestErrorHandler(res, 400, "Signature id is missing.");
   } else {
-    const image = files.signature;
-    const fileContents = readFileSync(image.tempFilePath).toString();
-    knex("Signature")
-      .where("id", files.id)
-      .update({ image: fileContents })
-      .then(rowsAffected => {
-        if (rowsAffected === 1) {
-          successHandler(res, rowsAffected, `Successfully updated signature, modified rows: ${rowsAffected}.`)
-        } else {
-          requestErrorHandler(res, 404, `Signature with id: ${files.id} not found.`)
-        }
-      })
-      .catch(error => {
-        databaseErrorHandler(res, error)
-      })
+    try {
+      const image = files.signature;
+      const fileContents = readFileSync(image.tempFilePath).toString();
+      const rowsAffected = await knex("Signature")
+        .where("id", files.id)
+        .update({ image: fileContents })
+      if (rowsAffected === 1) {
+        successHandler(res, rowsAffected, `Successfully updated signature, modified rows: ${rowsAffected}.`)
+      } else {
+        requestErrorHandler(res, 404, `Signature with id: ${files.id} not found.`)
+      }
+    } catch (error) {
+      databaseErrorHandler(res, error)
+    }
   }
 })
 
