@@ -14,7 +14,7 @@ signatureRouter.get("/all", async (_, res) => {
   try {
     const signatures = await knex("Signature")
     return signatures
-      ? successHandler(res, signatures, "Signatures successfully retrieved.")
+      ? successHandler(res, signatures)
       : requestErrorHandler(res, 404, "Request error. Data not found.")
   } catch (err) {
     databaseErrorHandler(res, err)
@@ -58,7 +58,7 @@ signatureRouter.post("/", async (req, res) => {
       const rowIdArr = await knex
         .insert({ image: filecontents })
         .into("Signature")
-      successHandler(res, rowIdArr, `Signature successfully saved, inserted row id: ${rowIdArr}`)
+      successHandler(res, rowIdArr, `Signature successfully saved, inserted row id: ${rowIdArr}`, 201)
     } catch (err) {
       databaseErrorHandler(res, err);
     }
