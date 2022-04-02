@@ -3,7 +3,7 @@ It's now fixed to make it super simple to save the image to db */
 
 CREATE TABLE IF NOT EXISTS Signature (
     id VARCHAR(36) NOT NULL DEFAULT (UUID()),
-    image BLOB NOT NULL,
+    image TEXT NOT NULL,
     signed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
     PRIMARY KEY (id)
 );

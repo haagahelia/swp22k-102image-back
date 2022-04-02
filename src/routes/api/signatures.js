@@ -54,7 +54,7 @@ signatureRouter.post("/", async (req, res) => {
   } else {
     try {
       const image = files.signature;
-      const filecontents = readFileSync(image.tempFilePath).toString();
+      const filecontents = readFileSync(image.tempFilePath).toString("base64");
       const rowIdArr = await knex
         .insert({ image: filecontents })
         .into("Signature")
